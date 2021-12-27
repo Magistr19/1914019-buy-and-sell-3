@@ -1,28 +1,18 @@
 'use strict';
 
-const version = require('./src/version');
-const help = require('./src/help');
-const generate = require('./src/generate');
+const {Cli} = require(`./cli`);
+const {
+  DEFAULT_COMMAND,
+  USER_ARGV_INDEX,
+  ExitCode
+} = require(`../constants`);
 
-const AVAILABLE_COMMANDS = ['--version', '--help', '--generate'];
-const command = process.argv[2];
+const userArguments = process.argv.slice(USER_ARGV_INDEX);
+const [userCommand] = userArguments;
 
-if (!command || !AVAILABLE_COMMANDS.includes(command)) {
-  return help.getHelpInfo();
+if (userArguments.length === 0 || !Cli[userCommand]) {
+  Cli[DEFAULT_COMMAND].run();
+  process.exit(ExitCode.success);
 }
 
-switch (command) {
-  case '--version': {
-    version.getPackageVersion();
-    break;
-  }
-  case '--help': {
-    help.getHelpInfo();
-    break;
-  }
-  case '--generate': {
-    const count = Number(process.argv[3]) || 1;
-    generate.createMocks(count);
-    break;
-  }
-}
+Cli[userCommand].run(userArguments.slice(1));
