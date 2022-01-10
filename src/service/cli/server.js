@@ -3,6 +3,7 @@
 const chalk = require(`chalk`);
 const http = require(`http`);
 const fs = require(`fs`).promises;
+const {HttpCode} = require(`../../constants`);
 
 const DEFAULT_PORT = 3000;
 const FILENAME = `mocks.json`;
@@ -26,6 +27,23 @@ const onClientConnect = async (req, res) => {
       sendResponse(res, HttpCode.NOT_FOUND, notFoundMessageText);
       break;
   }
+};
+
+const sendResponse = (res, statusCode, message) => {
+  const template = `
+    <!Doctype html>
+      <html lang="ru">
+      <head>
+        <title>With love from Node</title>
+      </head>
+      <body>${message}</body>
+    </html>`.trim();
+
+  res.writeHead(statusCode, {
+    'Content-Type': `text/html; charset=UTF-8`,
+  });
+
+  res.end(template);
 };
 
 module.exports = {
